@@ -113,6 +113,7 @@ uvicorn src.main:app --reload
 📌 **Fork this repo & create a new branch `candidate-<yourname>`**.  
 📌 **Push your implementation & submit a Pull Request (PR)**.  
 📌 **Explain your approach in a README**.  
+📌 **Good to have - A deployed version **.  
 
 For questions, contact us at: **wizard@briskk.one**  
 
