@@ -62,7 +62,7 @@ GET /api/autocomplete?q=find+me
 
 ---
 
-### **🔹 Task 4: Real-Time Speech-to-Search (WebSockets)**
+### **🔹 Task 4(optional): Real-Time Speech-to-Search (WebSockets)**
 ✅ Upgrade the system to **process live speech queries** via WebSockets:  
 - Accept **real-time audio streams**.  
 - **Continuously transcribe & autocomplete** results dynamically.  
