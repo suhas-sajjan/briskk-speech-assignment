@@ -1,37 +1,30 @@
-from fastapi import FastAPI, File, UploadFile, WebSocket
+from fastapi import FastAPI, UploadFile, File
 import whisper
-import io
-import uvicorn
+import os
 
 app = FastAPI()
 
-# Load the OpenAI Whisper model (Tiny model for speed)
-model = whisper.load_model("tiny")
+# Load the Whisper model (using "base" as you tested)
+model = whisper.load_model("base")
+
+@app.get("/")
+def check_server():
+    """See if the server is on."""
+    return {"message": "Server is on"}
 
 @app.post("/api/voice-to-text")
-async def voice_to_text(audio: UploadFile = File(...)):
-    audio_data = await audio.read()
-    audio_file = io.BytesIO(audio_data)
-    result = model.transcribe(audio_file)
-    return {"text": result["text"]}
+async def transcribe_audio(audio: UploadFile = File(...)):
+    """Turn audio into text using Whisper."""
+    # Save the uploaded file temporarily with a clean name
+    temp_path = os.path.join("temp_audio.wav")
+    with open(temp_path, "wb") as f:
+        f.write(await audio.read())  # Save the uploaded audio
 
-@app.get("/api/autocomplete")
-async def autocomplete(q: str):
-    suggestions = [
-        f"{q} red shoes",
-        f"{q} blue jeans",
-        f"{q} latest trends"
-    ]
-    return {"suggestions": suggestions}
+    # Transcribe the audio using the loaded model
+    result = model.transcribe(temp_path)
+    text = result["text"]  # Get the transcribed text
 
-@app.websocket("/ws/speech-to-search")
-async def speech_to_search(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        audio_chunk = await websocket.receive_bytes()
-        audio_file = io.BytesIO(audio_chunk)
-        result = model.transcribe(audio_file)
-        await websocket.send_text(result["text"])
+    # Clean up the temporary file
+    os.remove(temp_path)
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    return {"text": text}
